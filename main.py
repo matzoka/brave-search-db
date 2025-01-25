@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import os
+import io
 from dotenv import load_dotenv
 
 # 環境変数の読み込み
@@ -93,15 +94,38 @@ if st.button("検索実行", type="primary"):
                         hide_index=True
                     )
 
-                    # CSV変換
-                    csv = df.to_csv(index=False).encode('utf-8-sig')  # BOMを追加してExcelで文字化けを防ぐ
-                    filename = f"search_results_{search_query.replace(' ', '_')[:30]}.csv"
-                    st.download_button(
-                        label="📥 CSVダウンロード",
-                        data=csv,
-                        file_name=filename,
-                        mime="text/csv"
+                    # ファイル形式の選択（デフォルトはEXCEL）
+                    file_format = st.radio(
+                        "出力形式を選択",
+                        ["EXCEL", "CSV"],
+                        index=0,  # デフォルトでEXCELを選択
+                        horizontal=True  # 横並びに表示
                     )
+
+                    base_filename = f"search_results_{search_query.replace(' ', '_')[:30]}"
+
+                    if file_format == "EXCEL":
+                        # Excel形式で出力
+                        excel_buffer = io.BytesIO()
+                        with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+                            df.to_excel(writer, index=False, sheet_name='検索結果')
+                        excel_data = excel_buffer.getvalue()
+                        st.download_button(
+                            label="📥 Excelダウンロード",
+                            data=excel_data,
+                            file_name=f"{base_filename}.xlsx",
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
+                    else:
+                        # CSV形式で出力（BOMを追加してExcelで文字化けを防ぐ）
+                        csv_data = df.to_csv(index=False).encode('utf-8-sig')
+                        st.download_button(
+                            label="📥 CSVダウンロード",
+                            data=csv_data,
+                            file_name=f"{base_filename}.csv",
+                            mime="text/csv"
+                        )
+
                 else:
                     st.warning("🔍 検索結果が見つかりませんでした。検索キーワードを変更してお試しください。")
                     st.info("💡 TIP: スペースで区切って複数のキーワードを指定することもできます")
@@ -117,11 +141,12 @@ with st.expander("💡 使い方と注意事項"):
     ### 使い方
     1. .envファイルにBrave Search APIキーを設定
     2. 検索キーワードを入力
-    3. 取得件数を選択（最大20件）
+    3. 取得件数を選択（最大50件）
     4. 「検索実行」ボタンをクリック
+    5. 出力形式（EXCEL/CSV）を選択してダウンロード
 
     ### 注意事項
     - APIキーは.envファイルで管理します
-    - 検索結果はCSVとしてダウンロード可能です
+    - 検索結果はEXCELまたはCSV形式でダウンロード可能です
     - 日本語検索に対応しています
     """)
