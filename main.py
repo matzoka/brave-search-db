@@ -6,10 +6,20 @@ import io
 from dotenv import load_dotenv
 
 # 環境変数の読み込み
-load_dotenv()
+try:
+    load_dotenv()
+
+    API_KEY = os.getenv('BRAVE_API_KEY')
+except:
+    API_KEY = None
 
 # Brave Search API設定
-API_KEY = os.getenv('BRAVE_API_KEY')
+if not API_KEY:
+    try:
+        API_KEY = st.secrets['secret']['BRAVE_API_KEY']
+    except:
+        API_KEY = None
+
 API_URL = 'https://api.search.brave.com/res/v1/web/search'
 
 def brave_search(query, num_results):
@@ -51,8 +61,9 @@ st.write("検索キーワードを入力して検索結果を取得します")
 
 # API_KEYが設定されているか確認
 if not API_KEY:
-    st.error("⚠️ Brave Search API Keyが設定されていません。.envファイルを確認してください。")
-    st.info("💡 .envファイルにBRAVE_API_KEY=あなたのAPIキー を設定してください。")
+    st.error("⚠️ Brave Search API Keyが設定されていません。")
+    st.info("💡 ローカル環境: .envファイルにBRAVE_API_KEY=あなたのAPIキー を設定")
+    st.info("💡 Streamlit Cloud: Settings > Secrets に 'secret.BRAVE_API_KEY' を設定")
     st.stop()
 
 # 検索オプションの配置を2カラムに分ける
