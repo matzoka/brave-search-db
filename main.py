@@ -60,7 +60,7 @@ col1, col2 = st.columns(2)
 with col1:
     search_query = st.text_input("検索キーワード", placeholder="検索キーワードを入力してください")
 with col2:
-    num_results = st.number_input("取得件数", min_value=1, max_value=50, value=10, help="最大50件まで取得できます")
+    num_results = st.number_input("取得件数", min_value=1, max_value=50, value=50, help="最大50件まで取得できます")
 
 if st.button("検索実行", type="primary"):
     if search_query:
