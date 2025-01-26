@@ -71,7 +71,7 @@ streamlit run main.py
 
 - APIキーは`.env`ファイルまたはStreamlit Cloudの Secrets で安全に管理
 - APIキーはGitHubには公開しないでください
-- API利用制限は[Google Search API](https://www.searchapi.io/api/)の規約をご確認ください
+- API利用制限は[Google Search API](https://www.searchapi.io/)の規約をご確認ください
 
 ## 📝 ライセンス
 
