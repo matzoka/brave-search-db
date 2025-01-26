@@ -60,7 +60,7 @@ def searchAPI_search(query, num_results):
         raise Exception(f"検索結果の処理に失敗しました: {str(e)}")
 
 # Streamlit UI
-st.title("検索結果エクスポーター")
+st.title("Google検索アシスタント")
 st.write("検索キーワードを入力して検索結果を取得します")
 
 # SearchAPI.io API_KEYが設定されているか確認
@@ -177,6 +177,6 @@ with st.expander("💡 使い方と注意事項"):
     4. 出力形式（EXCEL/CSV）を選択してダウンロード
 
     ### 注意事項
-    - .envファイルに searchapi.io APIキーを設定してください
-      例：SEARCH_API_KEY=abcd1234****
+    - .envファイルに searchapi.io APIキーを設定してください\n
+    　例: SEARCH_API_KEY=abcd1234****
     """)
