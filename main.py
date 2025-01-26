@@ -73,48 +73,56 @@ if not API_KEY:
 # 検索オプションの配置を2カラムに分ける
 col1, col2 = st.columns(2)
 with col1:
+    # セッションステートの初期化
+    if 'last_query' not in st.session_state:
+        st.session_state.last_query = ''
+
     search_query = st.text_input(
         "検索キーワード",
         placeholder="検索キーワードを入力してください",
         help="""検索キーワードの指定方法：
 
-• 除外ワード指定：キーワードの前に「-」を付ける\n  例：東京 -大阪（「東京」を含み「大阪」を含まない）\n
-• サイト除外：-site:ドメイン名
-  例：Python -site:stackoverflow.com
-"""
+• 除外ワード指定：キーワードの前に「-」を付ける\n  例：東京 -大阪（「東京」を含み「大阪」を含まない）
+
+• サイト除外：-site:ドメイン名\n  例：Python -site:stackoverflow.com
+""",
+        key="search_input"
     )
+
 with col2:
     num_results = st.number_input("取得件数", min_value=1, value=50, step=10, help="10件単位で調整できます")
 
-if st.button("検索実行", type="primary"):
-    if search_query:
-        with st.spinner("検索中..."):
-            try:
-                search_results = searchAPI_search(search_query, num_results)
+# エンターキー押下時または検索ボタンクリック時に検索を実行
+search_clicked = st.button("検索実行", type="primary")
+if search_query and (search_clicked or search_query != st.session_state.last_query):
+    st.session_state.last_query = search_query
+    with st.spinner("検索中..."):
+        try:
+            search_results = searchAPI_search(search_query, num_results)
 
-                if search_results:
-                    # 結果をDataFrameに変換
-                    df_data = [
-                        {
-                            "Rank": i + 1,
-                            "Title": result["title"],
-                            "URL": result["url"],
-                            "Description": result["description"]
-                        }
-                        for i, result in enumerate(search_results)
-                    ]
-                    df = pd.DataFrame(df_data)
-                    # セッションステートに保存
-                    st.session_state['search_results_df'] = df
-                    st.session_state['last_query'] = search_query
-                else:
-                    st.warning("🔍 検索結果が見つかりませんでした。検索キーワードを変更してお試しください。")
-                    st.info("💡 TIP: スペースで区切って複数のキーワードを指定することもできます")
+            if search_results:
+                # 結果をDataFrameに変換
+                df_data = [
+                    {
+                        "Rank": i + 1,
+                        "Title": result["title"],
+                        "URL": result["url"],
+                        "Description": result["description"]
+                    }
+                    for i, result in enumerate(search_results)
+                ]
+                df = pd.DataFrame(df_data)
+                # セッションステートに保存
+                st.session_state['search_results_df'] = df
+                st.session_state['last_query'] = search_query
+            else:
+                st.warning("🔍 検索結果が見つかりませんでした。検索キーワードを変更してお試しください。")
+                st.info("💡 TIP: スペースで区切って複数のキーワードを指定することもできます")
 
-            except Exception as e:
-                st.error(f"❌ エラーが発生しました: {str(e)}")
-    else:
-        st.warning("⚠️ 検索キーワードを入力してください")
+        except Exception as e:
+            st.error(f"❌ エラーが発生しました: {str(e)}")
+elif not search_query:
+    st.warning("⚠️ 検索キーワードを入力してください")
 
 # 検索結果が保存されている場合、出力オプションを表示
 if 'search_results_df' in st.session_state:
@@ -171,12 +179,14 @@ if 'search_results_df' in st.session_state:
 with st.expander("💡 使い方と注意事項"):
     st.markdown("""
     ### 使い方
-    1. 検索キーワードを入力
-    2. 取得件数を選択
-    3. 「検索実行」ボタンをクリック
-    4. 出力形式（EXCEL/CSV）を選択してダウンロード
+    1. .envファイルにSearchAPI.io APIキーを設定
+    2. 検索キーワードを入力
+    3. 取得件数を選択
+    4. 「検索実行」ボタンをクリック
+    5. 出力形式（EXCEL/CSV）を選択してダウンロード
 
     ### 注意事項
-    - .envファイルに searchapi.io APIキーを設定してください\n
-    　例: SEARCH_API_KEY=abcd1234****
+    - SearchAPI.ioのAPIキーは.envファイルで管理します
+    - 検索結果はEXCELまたはCSV形式でダウンロード可能です
+    - 日本語検索に対応しています
     """)
