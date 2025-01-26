@@ -67,6 +67,7 @@ streamlit run main.py
 ## 注意事項
 
 - ローカル環境では`.env`ファイル、Streamlit Cloudでは Secrets で APIキーを管理
+  例：SEARCH_API_KEY=abcd1234****
 - APIキーはGitHubには公開しないようご注意ください
 - API利用制限については[Google Search API](https://www.searchapi.io/api/)の利用規約をご確認ください
 
