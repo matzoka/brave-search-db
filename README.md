@@ -1,10 +1,10 @@
-# Brave Search Results Exporter
+# Google Search Results Exporter
 
-Brave Search APIを使用して検索結果をCSVファイルとしてエクスポートできるStreamlitアプリケーションです。
+Google Search APIを使用して検索結果をCSVファイルとしてエクスポートできるStreamlitアプリケーションです。
 
 ## 機能
 
-- Brave Search APIを使用した検索
+- Google Search APIを使用した検索
 - 任意の件数で検索結果を取得可能
 - 10件単位での簡単な件数調整
 - 検索結果のリアルタイム表示
@@ -14,13 +14,13 @@ Brave Search APIを使用して検索結果をCSVファイルとしてエクス�
 ## 必要要件
 
 - Python 3.8以上
-- Brave Search APIキー
+- Google Search APIキー
 
 ## インストール
 
 ```bash
-git clone https://github.com/[your-username]/brave-search-db.git
-cd brave-search-db
+git clone https://github.com/[your-username]/google-search.git
+cd google-search
 pip install -r requirements.txt
 ```
 
@@ -32,7 +32,7 @@ pip install -r requirements.txt
 2. 以下の内容を追加：
 
 ```
-BRAVE_API_KEY=あなたのAPIキー
+SEARCH_API_KEY=あなたのAPIキー
 ```
 
 ### Streamlit Cloudでの設定
@@ -42,7 +42,7 @@ BRAVE_API_KEY=あなたのAPIキー
 3. Settings > Secrets セクションで以下を設定：
    ```toml
    [secret]
-   BRAVE_API_KEY = "あなたのAPIキー"
+   SEARCH_API_KEY = "あなたのAPIキー"
    ```
 
 ## 使用方法
@@ -61,7 +61,7 @@ streamlit run main.py
 
 - ローカル環境では`.env`ファイル、Streamlit Cloudでは Secrets で APIキーを管理
 - APIキーはGitHubには公開しないようご注意ください
-- API利用制限については[Brave Search API](https://brave.com/search/api/)の利用規約をご確認ください
+- API利用制限については[Google Search API](https://www.searchapi.io/api/)の利用規約をご確認ください
 
 ## ライセンス
 

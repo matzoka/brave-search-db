@@ -9,29 +9,31 @@ from dotenv import load_dotenv
 try:
     load_dotenv()
 
-    API_KEY = os.getenv('BRAVE_API_KEY')
+    API_KEY = os.getenv('SEARCH_API_KEY')
 except:
     API_KEY = None
 
-# Brave Search API設定
+# SearchAPI.io設定
 if not API_KEY:
     try:
-        API_KEY = st.secrets['secret']['BRAVE_API_KEY']
+        API_KEY = st.secrets['secret']['SEARCH_API_KEY']
     except:
         API_KEY = None
 
-API_URL = 'https://api.search.brave.com/res/v1/web/search'
+API_URL = 'https://www.searchapi.io/api/v1/search'
 
-def brave_search(query, num_results):
-    """Brave Search APIを使用して検索を実行"""
+def searchAPI_search(query, num_results):
+    """Search APIを使用して検索を実行"""
     headers = {
-        'X-Subscription-Token': API_KEY,
         'Accept': 'application/json',
     }
 
     params = {
+        'engine': 'google',
         'q': query,
-        'count': num_results
+        'num': num_results
+,
+        'api_key': API_KEY
     }
 
     try:
@@ -41,11 +43,11 @@ def brave_search(query, num_results):
         data = response.json()
         results = []
 
-        for item in data.get('web', {}).get('results', []):
+        for item in data.get('organic_results', []):
             results.append({
-                'title': item.get('title', ''),
-                'description': item.get('description', ''),
-                'url': item.get('url', '')
+                'title': item.get('title', 'No Title'),
+                'description': item.get('snippet', 'No Description'),
+                'url': item.get('link', 'No URL')
             })
 
         return results
@@ -59,11 +61,11 @@ def brave_search(query, num_results):
 st.title("検索結果エクスポーター")
 st.write("検索キーワードを入力して検索結果を取得します")
 
-# API_KEYが設定されているか確認
+# SearchAPI.io API_KEYが設定されているか確認
 if not API_KEY:
-    st.error("⚠️ Brave Search API Keyが設定されていません。")
-    st.info("💡 ローカル環境: .envファイルにBRAVE_API_KEY=あなたのAPIキー を設定")
-    st.info("💡 Streamlit Cloud: Settings > Secrets に 'secret.BRAVE_API_KEY' を設定")
+    st.error("⚠️ SearchAPI.io API Keyが設定されていません。")
+    st.info("💡 ローカル環境: .envファイルにSEARCH_API_KEY=あなたのAPIキー を設定")
+    st.info("💡 Streamlit Cloud: Settings > Secrets に 'secret.SEARCH_API_KEY' を設定")
     st.stop()
 
 # 検索オプションの配置を2カラムに分ける
@@ -77,7 +79,7 @@ if st.button("検索実行", type="primary"):
     if search_query:
         with st.spinner("検索中..."):
             try:
-                search_results = brave_search(search_query, num_results)
+                search_results = searchAPI_search(search_query, num_results)
 
                 if search_results:
                     # 結果をDataFrameに変換
@@ -150,14 +152,14 @@ if st.button("検索実行", type="primary"):
 with st.expander("💡 使い方と注意事項"):
     st.markdown("""
     ### 使い方
-    1. .envファイルにBrave Search APIキーを設定
+    1. .envファイルにSearchAPI.io APIキーを設定
     2. 検索キーワードを入力
     3. 取得件数を選択（最大50件）
     4. 「検索実行」ボタンをクリック
     5. 出力形式（EXCEL/CSV）を選択してダウンロード
 
     ### 注意事項
-    - APIキーは.envファイルで管理します
+    - SearchAPI.ioのAPIキーは.envファイルで管理します
     - 検索結果はEXCELまたはCSV形式でダウンロード可能です
     - 日本語検索に対応しています
     """)
